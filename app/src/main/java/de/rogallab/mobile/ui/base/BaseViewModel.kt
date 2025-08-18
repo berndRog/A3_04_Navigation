@@ -22,7 +22,7 @@ open class BaseViewModel(
    // CoroutineExceptionHandler to handle uncaught exceptions in coroutines
    protected val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
       logError(_tag, "CoroutineExceptionHandler: ${throwable.localizedMessage}")
-      handleErrorEvent(throwable)
+      handleErrorEvent(throwable.message ?: "Coroutine error")
    }
 
    // Channel + Flow for Error handling
@@ -31,12 +31,12 @@ open class BaseViewModel(
 
    // MutableSharedFlow with replay = 1 ensures that the last emitted error is replayed to new collectors,
    // allowing the error to be shown immediately when a new observer collects the flow (navigation case).
-   private val _errorFlow = MutableSharedFlow<ErrorState?>(replay = 1) // Changed
-   val errorFlow: Flow<ErrorState?> = _errorFlow.asSharedFlow() // Changed
+   private val _errorSharedFlow = MutableSharedFlow<ErrorState?>(replay = 1) // Changed
+   val errorFlow: Flow<ErrorState?> = _errorSharedFlow.asSharedFlow() // Changed
 
    // handle throwable, i.e. an error event
    fun handleErrorEvent(
-      throwable: Throwable? = null,
+//      throwable: Throwable? = null,
       message: String? = null,
       actionLabel: String? = null,       // no actionLabel by default
       onActionPerform: () -> Unit = {},  // do nothing by default
@@ -46,8 +46,9 @@ open class BaseViewModel(
       // delayed navigation
       navKey: NavKey? = null           // no navigation by default
    ) {
-      val errorMessage =  throwable?.message ?: message ?: "Unknown error"
+//      val errorMessage =  throwable?.message ?: message ?: "Unknown error"
 
+      val errorMessage = message ?: "Unknown error"
       val errorState = ErrorState(
          message = errorMessage,
          actionLabel = actionLabel,
@@ -67,7 +68,7 @@ open class BaseViewModel(
       viewModelScope.launch {
          logError(_tag, errorMessage)
          // _errorChannel.send(errorState)
-         _errorFlow.emit(errorState)
+         _errorSharedFlow.emit(errorState)
       }
    }
 
@@ -86,14 +87,14 @@ open class BaseViewModel(
       )
       viewModelScope.launch {
          // _errorChannel.send(errorState)
-         _errorFlow.emit(errorState)
+         _errorSharedFlow.emit(errorState)
       }
    }
 
    fun clearErrorState() {
       viewModelScope.launch {
          //_errorChannel.send(null)  // Emit null to clear the error state
-         _errorFlow.emit(null)  // Emit null to clear the error state
+         _errorSharedFlow.emit(null)  // Emit null to clear the error state
       }
    }
 }

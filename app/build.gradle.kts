@@ -51,6 +51,8 @@ dependencies {
    // Ui Activity
    // https://developer.android.com/jetpack/androidx/releases/activity
    implementation(libs.androidx.activity.compose)
+   implementation(libs.androidx.runtime)
+
    // Ui Compose
    // https://developer.android.com/jetpack/compose/bom/bom-mapping
    val composeBom = platform(libs.androidx.compose.bom)
@@ -101,9 +103,9 @@ dependencies {
    implementation(libs.koin.android)
    implementation(libs.koin.androidx.compose)
 
-
    // Ktor/Kotlin JSON Serializer
    implementation(libs.kotlinx.serialization.json)
+   implementation(libs.kotlinx.datetime)
 
    // Retrofit
    implementation(libs.gson.json)

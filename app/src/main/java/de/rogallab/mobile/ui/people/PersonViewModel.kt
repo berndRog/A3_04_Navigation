@@ -35,6 +35,7 @@ class PersonViewModel(
          is PersonIntent.LastNameChange -> onLastNameChange(intent.lastName)
          is PersonIntent.EmailChange -> onEmailChange(intent.email)
          is PersonIntent.PhoneChange -> onPhoneChange(intent.phone)
+         is PersonIntent.ImagePathChange -> onFilePathChange(intent.uriString)
 
          is PersonIntent.Clear -> clearState()
          is PersonIntent.FetchById -> fetchById(intent.id)
@@ -73,6 +74,13 @@ class PersonViewModel(
          it.copy(person = it.person.copy(phone = trimmed))
       }
    }
+   private fun onFilePathChange(uriString: String?) {
+      val trimmed = uriString?.trim()
+      if(trimmed == _personUiStateFlow.value.person.imagePath) return
+      _personUiStateFlow.update { it: PersonUiState ->
+         it.copy(person = it.person.copy(imagePath = uriString))
+      }
+   }
 
    private fun fetchById(id: String) {
       when (val resultData = _repository.getById(id)) {
@@ -105,14 +113,14 @@ class PersonViewModel(
       logDebug(TAG, "createPerson")
       when (val resultData = _repository.create(_personUiStateFlow.value.person)) {
          is ResultData.Success -> fetch() // refresh the list
-         is ResultData.Error -> handleErrorEvent(resultData.throwable)
+         is ResultData.Error -> handleErrorEvent(resultData.message)
       }
    }
    private fun update() {
       logDebug(TAG, "updatePerson")
       when (val resultData = _repository.update(_personUiStateFlow.value.person)) {
          is ResultData.Success -> fetch() // refresh the list
-         is ResultData.Error -> handleErrorEvent(resultData.throwable)
+         is ResultData.Error -> handleErrorEvent(resultData.message)
       }
    }
 
@@ -122,7 +130,7 @@ class PersonViewModel(
       logDebug(TAG, "removePerson: $person")
       when (val resultData = _repository.remove(person)) {
          is ResultData.Success -> fetch() // refresh the list
-         is ResultData.Error -> handleErrorEvent(resultData.throwable)
+         is ResultData.Error -> handleErrorEvent(resultData.message)
       }
    }
    private fun undoRemove() {
@@ -136,10 +144,13 @@ class PersonViewModel(
                }
                fetch()
             }
-            is ResultData.Error -> handleErrorEvent(resultData.throwable)
+            is ResultData.Error -> handleErrorEvent(resultData.message)
          }
       }
    }
+
+
+
 
    // validate all input fields after user finished input into the form
    fun validate(): Boolean {
@@ -200,7 +211,7 @@ class PersonViewModel(
                it.copy(people = fetchedData)
             }
          }
-         is ResultData.Error -> handleErrorEvent(resultData.throwable)
+         is ResultData.Error -> handleErrorEvent(resultData.message)
       }
    }
    // endregion

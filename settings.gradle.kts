@@ -19,6 +19,6 @@ dependencyResolutionManagement {
    }
 }
 
-rootProject.name = "A3_04_Navigation"
+rootProject.name = "A4_01_CameraPermissions"
 include(":app")
  

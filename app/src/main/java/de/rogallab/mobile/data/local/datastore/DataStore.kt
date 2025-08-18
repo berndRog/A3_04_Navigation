@@ -1,6 +1,8 @@
 package de.rogallab.mobile.data.local.datastore
 
 import android.content.Context
+import de.rogallab.mobile.MainApplication.Companion.DIRECTORY_NAME
+import de.rogallab.mobile.MainApplication.Companion.FILE_NAME
 import de.rogallab.mobile.data.IDataStore
 import de.rogallab.mobile.data.local.Seed
 import de.rogallab.mobile.domain.entities.Person
@@ -11,7 +13,8 @@ import kotlinx.serialization.json.Json
 import java.io.File
 
 class DataStore(
-   private val _context: Context
+   private val _context: Context,
+   private val _seed: Seed
 ): IDataStore {
 
    // list of people
@@ -75,8 +78,7 @@ class DataStore(
          val file = File(filePath)
          if (!file.exists() || file.readText().isBlank()) {
             // seed _people with some data
-            val seed = Seed(_context)
-            _people.addAll(seed.people)
+            _people.addAll(_seed.people)
             logVerbose(TAG, "create(): seedData ${_people.size} people")
             write()
             return
@@ -138,7 +140,5 @@ class DataStore(
 
    companion object {
       private const val TAG = "<-DataStore"
-      private const val DIRECTORY_NAME = "android"
-      private const val FILE_NAME = "people3.json"
    }
 }

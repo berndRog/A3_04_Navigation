@@ -14,7 +14,7 @@ class PersonRepository(
          //throw Exception("Failed to fetch all people")
          ResultData.Success(_dataStore.selectAll())
       } catch (t: Throwable) {
-         ResultData.Error(t)
+         ResultData.Error(t.message ?: "Error in getAll()")
       }
 
    override fun getWhere(
@@ -23,7 +23,7 @@ class PersonRepository(
       try {
          ResultData.Success(_dataStore.selectWhere(predicate))
       } catch (t: Throwable) {
-         ResultData.Error(t)
+         ResultData.Error(t.message ?: "Error in getWhere()")
       }
 
    override fun getById(id: String): ResultData<Person?> =
@@ -31,7 +31,7 @@ class PersonRepository(
          //throw Exception("Failed to get a person by id")
          ResultData.Success(_dataStore.findById(id))
       } catch (t: Throwable) {
-         ResultData.Error(t)
+         ResultData.Error(t.message ?: "Error in getById()")
       }
 
    override fun getBy(
@@ -40,7 +40,7 @@ class PersonRepository(
       try {
          ResultData.Success(_dataStore.findBy(predicate))
       } catch (t: Throwable) {
-         ResultData.Error(t)
+         ResultData.Error(t.message ?: "Error in getBy()")
       }
 
    override fun create(person: Person): ResultData<Unit> =
@@ -48,7 +48,7 @@ class PersonRepository(
          _dataStore.insert(person)
          ResultData.Success(Unit)
       } catch (t: Throwable) {
-         ResultData.Error(t)
+         ResultData.Error(t.message ?: "Error in create()")
       }
 
    override fun update(person: Person): ResultData<Unit> =
@@ -56,7 +56,7 @@ class PersonRepository(
          _dataStore.update(person)
          ResultData.Success(Unit)
       } catch (t: Throwable) {
-         ResultData.Error(t)
+         ResultData.Error(t.message ?: "Error in update()")
       }
 
    override fun remove(person: Person): ResultData<Unit> =
@@ -64,6 +64,6 @@ class PersonRepository(
          _dataStore.delete(person)
          ResultData.Success(Unit)
       } catch (t: Throwable) {
-         ResultData.Error(t)
+         ResultData.Error(t.message ?: "Error in remove()")
       }
 }

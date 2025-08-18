@@ -9,9 +9,11 @@ koin = "4.1.0"
 kotlinCoroutines = "1.10.2"
 kotlinxSerialization = "2.2.0"
 kotlinxSerializationJson = "1.9.0" #1.8.1
+kotlinDatetime = "0.5.0"
 lifecycle = "2.9.2"
 nav3Core = "1.0.0-alpha06"
 nav3Lifecycle = "1.0.0-alpha04"
+runtime = "1.9.0"
 
 material3Adaptive = "1.2.0-alpha10"
 windowsizeclass = "1.3.2"
@@ -35,13 +37,16 @@ mockitoKotlin = "6.0.0"
 # plugins
 agp = "8.12.0"
 kotlin = "2.2.0"    #"2.0.21"
-ksp = "2.2.0-2.0.2" #"2.0.21-1.0.27"
+ksp = "2.2.0-2.0.2"
 
 [libraries]
 # Kotlin coroutines, datetime and serialization
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinCoroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinCoroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinDatetime" }
+
+androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 
 # Activy + Compose (libs with no version numbers, belongs to BOM)
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -97,6 +102,8 @@ androidx-test-ext-junit-ktx = { module = "androidx.test.ext:junit-ktx", version.
 androidx-test-ext-truth = { module = "androidx.test.ext:truth", version.ref = "truth" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidTestRunner" }
 androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "manifest" }
+
 #androidx-navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigation" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "archCore" }
@@ -111,8 +118,6 @@ mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockito" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 
-# debugging ###########################################################################
-androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "manifest" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

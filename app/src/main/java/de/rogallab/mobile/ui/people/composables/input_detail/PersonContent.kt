@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import de.rogallab.mobile.R
 import de.rogallab.mobile.ui.people.PersonUiState
 import de.rogallab.mobile.ui.people.PersonValidator
-import de.rogallab.mobile.ui.people.composables.SelectAndShowImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,9 +57,7 @@ fun PersonContent(
          onPhoneChange = onPhoneChange,
          validatePhone = validator::validatePhone
       )
-      SelectAndShowImage(
-         imageUrl = personUiState.person.imagePath,      // State ↓viewModel.imagePath,                          // State ↓
-         onImageUrlChange = { Unit }                     // Event ↑
-      )
+
+
    }
 }
