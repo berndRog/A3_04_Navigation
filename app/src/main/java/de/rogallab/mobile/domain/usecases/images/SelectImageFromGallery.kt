@@ -1,4 +1,4 @@
-package de.rogallab.mobile.domain.usecases.photos
+package de.rogallab.mobile.domain.usecases.images
 
 import android.net.Uri
 import androidx.core.net.toUri
@@ -11,28 +11,23 @@ class SelectGalleryImageUseCase(
    suspend operator fun invoke(uriString: String): ResultData<Uri> {
 
       return try {
-
-         // Check if uriString is empty or blank
-         if (uriString.isBlank()) {
+         if (uriString.isBlank())
             return ResultData.Error("URI string cannot be empty")
-         }
 
-         val sourceUri = uriString.trim().toUri()
+         val uriMediaStore = uriString.trim().toUri()
 
          // Validate URI scheme (content:// or file://)
-         when (sourceUri.scheme) {
+         when (uriMediaStore.scheme) {
             "content", "file" -> {
                // Copy image to app's private storage
-               val destinationUri = _mediaStore.convertMediaStoreToAppStorage(sourceUri)
-
-               if (destinationUri != null) {
-                  ResultData.Success(destinationUri)
-               } else {
-                  ResultData.Error("Failed to copy image from gallery to app storage")
+               _mediaStore.convertMediaStoreToAppStorage(uriMediaStore)?.let { uriStorage ->
+                  return ResultData.Success(uriStorage)
+               } ?: run {
+                 ResultData.Error("Failed to copy image from gallery to app storage")
                }
             }
             else -> {
-               ResultData.Error("Invalid URI scheme: ${sourceUri.scheme}. Expected 'content' or 'file'")
+               ResultData.Error("Invalid URI scheme: ${uriMediaStore.scheme}. Expected 'content' or 'file'")
             }
          }
       } catch (e: Exception) {

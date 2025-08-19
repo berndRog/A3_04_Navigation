@@ -36,8 +36,8 @@ import de.rogallab.mobile.ui.people.PersonIntent
 import de.rogallab.mobile.ui.people.PersonUiState
 import de.rogallab.mobile.ui.people.PersonValidator
 import de.rogallab.mobile.ui.people.PersonViewModel
-import de.rogallab.mobile.ui.photos.PhotoViewModel
-import de.rogallab.mobile.ui.photos.composables.SelectAndShowImage
+import de.rogallab.mobile.ui.images.ImageViewModel
+import de.rogallab.mobile.ui.images.composables.SelectAndShowImage
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -47,7 +47,7 @@ import org.koin.compose.koinInject
 fun PersonDetailScreen(
    id: String,
    viewModel: PersonViewModel = koinViewModel(),
-   photoViewModel: PhotoViewModel = koinViewModel(),
+   imageViewModel: ImageViewModel = koinViewModel(),
    onNavigateReverse: () -> Unit = {},
    validator: PersonValidator = koinInject(),
 ) {
@@ -69,7 +69,14 @@ fun PersonDetailScreen(
          TopAppBar(
             title = { Text(text = stringResource(R.string.personDetail)) },
             navigationIcon = {
-               IconButton(onClick = onNavigateReverse) {
+               IconButton(
+                  onClick = {
+                     if (viewModel.validate()) {
+                        viewModel.onProcessPersonIntent(PersonIntent.Update)
+                        onNavigateReverse()
+                     }
+                  }
+               ) {
                   Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                      contentDescription = stringResource(R.string.back))
                }
@@ -135,7 +142,7 @@ fun PersonDetailScreen(
             },
             onGalleryImage = { uriString ->
                coroutineScope.launch {
-                  photoViewModel.selectImageFromGallery(uriString)?.let { uriStringStorage ->
+                  imageViewModel.selectImageFromGallery(uriString)?.let { uriStringStorage ->
                      viewModel.onProcessPersonIntent(
                         PersonIntent.ImagePathChange(uriStringStorage))
                   }
@@ -143,7 +150,7 @@ fun PersonDetailScreen(
             },
             onCameraImage = { groupName ->
                coroutineScope.launch {
-                  photoViewModel.captureImage(groupName)?.let { uriStringStorage ->
+                  imageViewModel.captureImage(groupName)?.let { uriStringStorage ->
                      viewModel.onProcessPersonIntent(PersonIntent.ImagePathChange(uriStringStorage))
                   }
                }

@@ -35,8 +35,8 @@ import de.rogallab.mobile.ui.people.PersonIntent
 import de.rogallab.mobile.ui.people.PersonUiState
 import de.rogallab.mobile.ui.people.PersonValidator
 import de.rogallab.mobile.ui.people.PersonViewModel
-import de.rogallab.mobile.ui.photos.PhotoViewModel
-import de.rogallab.mobile.ui.photos.composables.SelectAndShowImage
+import de.rogallab.mobile.ui.images.ImageViewModel
+import de.rogallab.mobile.ui.images.composables.SelectAndShowImage
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -45,7 +45,7 @@ import org.koin.compose.koinInject
 @Composable
 fun PersonInputScreen(
    viewModel: PersonViewModel = koinViewModel(),
-   photoViewModel: PhotoViewModel = koinViewModel(),
+   imageViewModel: ImageViewModel = koinViewModel(),
    onNavigateReverse: () -> Unit = {},
    validator: PersonValidator = koinInject(),
 ) {
@@ -136,7 +136,7 @@ fun PersonInputScreen(
             },
             onGalleryImage = { uriString ->
                coroutineScope.launch {
-                  photoViewModel.selectImageFromGallery(uriString)?.let { uriStringStorage ->
+                  imageViewModel.selectImageFromGallery(uriString)?.let { uriStringStorage ->
                      viewModel.onProcessPersonIntent(
                         PersonIntent.ImagePathChange(uriStringStorage))
                   }
@@ -144,7 +144,7 @@ fun PersonInputScreen(
             },
             onCameraImage = { groupName ->
                coroutineScope.launch {
-                  photoViewModel.captureImage(groupName)?.let { uriStringStorage ->
+                  imageViewModel.captureImage(groupName)?.let { uriStringStorage ->
                      viewModel.onProcessPersonIntent(PersonIntent.ImagePathChange(uriStringStorage))
                   }
                }

@@ -19,5 +19,5 @@
   <string name="back">Back</string>
   <string name="undoDeletePerson">Do you want to undo the persons deletion?</string>
   <string name="undoAnswer">Yes</string>
-  <string name="app_name">ScaffoldNavigation</string>
+  <string name="app_name">CameraPermissions</string>
 </resources>

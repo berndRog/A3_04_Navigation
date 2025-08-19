@@ -7,14 +7,14 @@ import de.rogallab.mobile.data.local.mediastore.MediaStore
 import de.rogallab.mobile.data.repositories.PersonRepository
 import de.rogallab.mobile.domain.IMediaStore
 import de.rogallab.mobile.domain.IPersonRepository
-import de.rogallab.mobile.domain.usecases.photos.CaptureImageUseCase
-import de.rogallab.mobile.domain.usecases.photos.SelectGalleryImageUseCase
+import de.rogallab.mobile.domain.usecases.images.CaptureImageUseCase
+import de.rogallab.mobile.domain.usecases.images.SelectGalleryImageUseCase
 import de.rogallab.mobile.domain.utilities.logInfo
 import de.rogallab.mobile.ui.navigation.INavHandler
 import de.rogallab.mobile.ui.navigation.Nav3ViewModel
 import de.rogallab.mobile.ui.people.PersonValidator
 import de.rogallab.mobile.ui.people.PersonViewModel
-import de.rogallab.mobile.ui.photos.PhotoViewModel
+import de.rogallab.mobile.ui.images.ImageViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
@@ -69,11 +69,9 @@ val definedModules: Module = module {
     factory {
         CaptureImageUseCase(_mediaStore = get<IMediaStore>())
     }
-    logInfo(tag, "factory   -> SelectImageFromGallery")
+    logInfo(tag, "factory   -> SelectGalleryImageUseCase")
     factory {
-        SelectGalleryImageUseCase(
-           _mediaStore = get<IMediaStore>()
-        )
+        SelectGalleryImageUseCase(_mediaStore = get<IMediaStore>())
     }
 
     // ui modules
@@ -81,8 +79,6 @@ val definedModules: Module = module {
     single<PersonValidator> {
         PersonValidator(_context = androidContext())
     }
-
-
 
     logInfo(tag, "viewModel -> Nav3ViewModel as INavHandler (with params)")
     viewModel { (startDestination: NavKey) ->  // Parameter for startDestination
@@ -97,15 +93,14 @@ val definedModules: Module = module {
            _validator = get<PersonValidator>()
         )
     }
-    logInfo(tag, "viewModel -> PhotoViewModel")
+    logInfo(tag, "viewModel -> ImageViewModel")
     viewModel { (navHandler: INavHandler) ->
-        PhotoViewModel(
+        ImageViewModel(
            _captureImageUseCase = get<CaptureImageUseCase>(),
            _selectImageFromGalleryUseCase = get<SelectGalleryImageUseCase>(),
            _navHandler = navHandler
         )
     }
-
 }
 
 val appModules: Module = module {

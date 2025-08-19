@@ -10,19 +10,20 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import de.rogallab.mobile.data.local.io.writeImageToStorage
+import de.rogallab.mobile.MainApplication.Companion.MEDIA_STORE_GROUP_NAME
 import de.rogallab.mobile.domain.IMediaStore
 import de.rogallab.mobile.domain.exceptions.IoException
+import de.rogallab.mobile.domain.utilities.logDebug
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
-import kotlin.text.compareTo
 
 class MediaStore(
    private val _context: Context,
@@ -44,12 +45,13 @@ class MediaStore(
    ): Uri? = withContext(_ioDispatcher) {
 
       return@withContext try {
-         val actualGroupName = groupName.ifEmpty { createSessionFolder() }
+         val actualGroupName = groupName.ifBlank { MEDIA_STORE_GROUP_NAME }
          val name = filename ?: UUID.randomUUID().toString()
+         logDebug(TAG, "createGroupedImageUri: groupName=$actualGroupName, name=$name")
 
          // Create a new image entry in MediaStore
          // Use MediaStore.Images.Media.EXTERNAL_CONTENT_URI for external storage
-         val values = ContentValues().apply {
+         val imageContentValues = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, "$name.jpg")
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
             put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
@@ -63,21 +65,24 @@ class MediaStore(
          // For Android 10 and above, useRELATIVE_PATH to specify the folder
          _context.contentResolver.insert(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            values
+            imageContentValues
          )?: throw IoException("Failed to create image URI in MediaStore")
       } catch (e: Exception) {
          throw IoException("Failed to create grouped image URI ${e.message}")
       }
    }
 
+
    // Delete all images from a specific folder/group
    override suspend fun deleteImageGroup(
       groupName: String
    ): Int = withContext(_ioDispatcher) {
       return@withContext try {
+         val actualGroupName = groupName.ifBlank { MEDIA_STORE_GROUP_NAME }
+
          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val selection = "${MediaStore.Images.Media.RELATIVE_PATH} LIKE ?"
-            val selectionArgs = arrayOf("%$groupName%")
+            val selectionArgs = arrayOf("%$actualGroupName%")
 
             _context.contentResolver.delete(
                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -87,7 +92,7 @@ class MediaStore(
          } else {
             // For older Android versions, delete by DATA column (deprecated but needed)
             val selection = "${MediaStore.Images.Media.DATA} LIKE ?"
-            val selectionArgs = arrayOf("%$groupName%")
+            val selectionArgs = arrayOf("%$actualGroupName%")
 
             // This will delete all images that match the group name in the file path
             _context.contentResolver.delete(
@@ -97,7 +102,8 @@ class MediaStore(
             )
          }
       } catch (e: Exception) {
-         throw IoException("Failed to delete image group: $groupName: ${e.message}")
+         val actualGroupName = groupName.ifBlank { MEDIA_STORE_GROUP_NAME }
+         throw IoException("Failed to delete image group: $actualGroupName: ${e.message}")
       }
    }
 
@@ -108,29 +114,51 @@ class MediaStore(
       sourceUri: Uri
    ): Uri? = withContext(_ioDispatcher) {
       try {
+         val actualGroupName = groupName.ifBlank { MEDIA_STORE_GROUP_NAME }
+         logDebug(TAG, "saveImageToMediaStore: groupName=$actualGroupName, sourceUri=$sourceUri")
+
          // Load bitmap from source URI
          val bitmap = loadBitmap(sourceUri) ?: return@withContext null
 
          // Create content values for MediaStore
-         val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "IMG_${System.currentTimeMillis()}.jpg")
+         val fileName = "${UUID.randomUUID()}.jpg"
+         val imageContentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/$groupName")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/$actualGroupName")
+            // Mark as pending during write operation
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+               put(MediaStore.Images.Media.IS_PENDING, 1)
+            }
          }
 
-         // Insert into MediaStore
-         val uri = _context.contentResolver.insert(
+         // Insert into MediaStore to get URI
+         val uriMediaStore = _context.contentResolver.insert(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues
+            imageContentValues
          ) ?: return@withContext null
+         logDebug(TAG, "uriMediaStore: $uriMediaStore")
 
-         // Write bitmap to MediaStore URI
-         _context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+         try {
+            _context.contentResolver.openOutputStream(uriMediaStore)?.use { outputStream ->
+               bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+            }
+
+            // Mark as no longer pending
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+               imageContentValues.clear()
+               imageContentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+               _context.contentResolver.update(uriMediaStore, imageContentValues, null, null)
+            }
+
+            bitmap.recycle()
+            uriMediaStore
+
+         } catch (e: Exception) {
+            // Clean up on failure
+            _context.contentResolver.delete(uriMediaStore, null, null)
+            throw e
          }
-
-         bitmap.recycle()
-         uri
 
       } catch (e: Exception) {
          e.printStackTrace()
@@ -247,5 +275,9 @@ class MediaStore(
          e.printStackTrace()
          null
       }
+   }
+
+   companion object {
+      private const val TAG = "<-MediaStore"
    }
 }

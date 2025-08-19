@@ -1,4 +1,4 @@
-package de.rogallab.mobile.ui.photos.composables
+package de.rogallab.mobile.ui.images.composables
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -50,7 +50,9 @@ fun CameraCheckPermission(
       onPermissionGranted()
    } else {
       Button(
-         onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) },
+         onClick = {
+            permissionLauncher.launch(Manifest.permission.CAMERA)
+         },
          modifier = Modifier.fillMaxWidth()
       ) {
          Icon(

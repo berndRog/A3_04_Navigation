@@ -23,7 +23,7 @@ import de.rogallab.mobile.ui.people.PersonViewModel
 import de.rogallab.mobile.ui.people.composables.input_detail.PersonDetailScreen
 import de.rogallab.mobile.ui.people.composables.input_detail.PersonInputScreen
 import de.rogallab.mobile.ui.people.composables.list.PeopleListScreen
-import de.rogallab.mobile.ui.photos.PhotoViewModel
+import de.rogallab.mobile.ui.images.ImageViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -32,7 +32,7 @@ fun AppNavigation(
    startDestination: NavKey = PeopleList,
    navViewModel: Nav3ViewModel = koinViewModel { parametersOf(startDestination) },
    personViewModel: PersonViewModel = koinViewModel { parametersOf(navViewModel) },
-   photoViewModel: PhotoViewModel = koinViewModel { parametersOf(navViewModel) },
+   imageViewModel: ImageViewModel = koinViewModel { parametersOf(navViewModel) },
    animationDuration: Int = 2500
 ) {
    val tag = "<-NavigationRoot"
@@ -96,7 +96,7 @@ fun AppNavigation(
          entry<PersonInput> {
             PersonInputScreen(
                viewModel = personViewModel,
-               photoViewModel = photoViewModel,
+               imageViewModel = imageViewModel,
                onNavigateReverse =  navViewModel::pop
             )
          }
@@ -104,7 +104,7 @@ fun AppNavigation(
             PersonDetailScreen(
                id = key.id,
                viewModel = personViewModel,
-               photoViewModel = photoViewModel,
+               imageViewModel = imageViewModel,
                onNavigateReverse = navViewModel::pop
             )
          }

@@ -1,4 +1,4 @@
-package de.rogallab.mobile.ui.photos.composables
+package de.rogallab.mobile.ui.images.composables
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult

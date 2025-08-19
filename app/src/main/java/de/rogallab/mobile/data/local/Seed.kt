@@ -2,14 +2,12 @@ package de.rogallab.mobile.data.local
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.BitmapFactory
 import android.net.Uri
-import de.rogallab.mobile.MainApplication.Companion.APP_NAME
 import de.rogallab.mobile.MainApplication.Companion.DIRECTORY_NAME
 import de.rogallab.mobile.MainApplication.Companion.FILE_NAME
+import de.rogallab.mobile.MainApplication.Companion.MEDIA_STORE_GROUP_NAME
 import de.rogallab.mobile.R
 import de.rogallab.mobile.data.local.io.deleteFileOnStorage
-import de.rogallab.mobile.data.local.io.writeImageToStorage
 import de.rogallab.mobile.domain.IMediaStore
 import de.rogallab.mobile.domain.entities.Person
 import de.rogallab.mobile.domain.utilities.logDebug
@@ -105,7 +103,7 @@ class Seed(
                // copy drawable as image to MediaStore
                _mediaStore.convertDrawableToMediaStore(
                   drawableId,
-                  APP_NAME
+                  MEDIA_STORE_GROUP_NAME
                )?.let { mediaUri: Uri ->
                   _mediaStoreUri.add(mediaUri.toString())
                }

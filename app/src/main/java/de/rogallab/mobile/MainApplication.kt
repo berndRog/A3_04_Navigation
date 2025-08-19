@@ -30,6 +30,7 @@ class MainApplication : Application() {
       const val IS_DEBUG = true
       const val IS_VERBOSE = false
       const val APP_NAME = "A4_01_CameraPermissions"
+      const val MEDIA_STORE_GROUP_NAME = "Photos CameraPermissions"
       const val DIRECTORY_NAME = "android"
       const val FILE_NAME = "people3.json"
       private const val TAG = "<-MainApplication"

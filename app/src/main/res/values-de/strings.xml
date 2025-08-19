@@ -20,5 +20,5 @@
   <string name="back">Zurück</string>
   <string name="undoDeletePerson">Soll das Löschen der Person rückgäging gemacht werden?</string>
   <string name="undoAnswer">Ja</string>
-  <string name="app_name">ScaffoldNavigation</string>
+  <string name="app_name">CameraPermissions</string>
 </resources>
